@@ -1,0 +1,4 @@
+for entry in "/tmp/*.ready"
+do
+  curl -v -F logs=@$entry -F rasp_id=$1 http://php54-denismosolov.rhcloud.com
+end
