@@ -13,7 +13,9 @@ if [[ $1 == "parse" ]]; then
     currentTime=$(date +%H_%M)
     if [ "$currentTime" != "$startTime" ]
     then
-      mv /tmp/$startTime.log /tmp/$startTime.ready
+      #mv /tmp/$startTime.log /tmp/$startTime.ready
+      sort /tmp/$startTime.log | uniq > /tmp/$startTime.ready
+      rm /tmp/$startTime.log
       sudo kill -9 $(pidof hcitool)
       exit 2
     fi
@@ -35,7 +37,7 @@ if [[ $1 == "parse" ]]; then
           POWER=`echo "ibase=16; $POWER" | bc`
           POWER=$[POWER - 256]
           # rotate log file each minute
-          echo "$UUID $MAJOR $MINOR $POWER" >> /tmp/${currentTime}.log
+          echo "$UUID" >> /tmp/${currentTime}.log
         fi
         capturing=""
         packet=""
