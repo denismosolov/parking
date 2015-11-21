@@ -1,14 +1,20 @@
 #!/bin/bash
 # iBeacon Scan by Radius Networks
-# run this script via cron (each 5 sec will be good)
-# first param - receiver_id (int) 
+# run this task with receiver_id param (int)
 
 if [[ $1 == "parse" ]]; then
   packet=""
   capturing=""
   count=0
+  startTime=$(date +%H_%M)
   while read line
   do
+    #exit after a minute
+    currentTime=$(date +%H_%M)
+    if [ "$currentTime" != "$startTime" ]
+    then
+     exit 2
+    fi
     count=$[count + 1]
     if [ "$capturing" ]; then
       if [[ $line =~ ^[0-9a-fA-F]{2}\ [0-9a-fA-F] ]]; then
@@ -26,14 +32,8 @@ if [[ $1 == "parse" ]]; then
           MINOR=`echo "ibase=16; $MINOR" | bc`
           POWER=`echo "ibase=16; $POWER" | bc`
           POWER=$[POWER - 256]
-          #if [[ $2 == "-b" ]]; then
-	    echo "$UUID $MAJOR $MINOR $POWER"
-          #else
-    	  #  echo "UUID: $UUID MAJOR: $MAJOR MINOR: $MINOR POWER: $POWER"
-          #fi
-
-          sleep 0.5 # our delay on 500 ms (don't need to ddos our web-server)
-          curl -X POST "receiver_id=$2&beacon_id=$UUID" http://php54-denismosolov.rhcloud.com/ # send data to our web-server
+          # rotate log file each minute
+          echo "$UUID $MAJOR $MINOR $POWER" >> /tmp/$(date +%H_%M).log
         fi
         capturing=""
         packet=""
@@ -48,7 +48,7 @@ if [[ $1 == "parse" ]]; then
     fi
   done
 else
-  sudo hcitool lescan 1>/dev/null & # removed —duplicates (our hack to filter dupes)
+  sudo hcitool lescan 1>/dev/null &
   if [ "$(pidof hcitool)" ]; then
     sudo hcidump --raw | ./$0 parse $1
   fi
