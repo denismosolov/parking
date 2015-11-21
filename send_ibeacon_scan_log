@@ -1,18 +1,18 @@
 #!/bin/bash
 
 if ls /tmp/*.log 1> /dev/null 2>&1; then
-	for file in /tmp/*.log
-	do
-	  mv "$file" "${file/.log/.ready}"
-	done
+  for file in /tmp/*.log
+  do
+    mv "$file" "${file/.log/.ready}"
+  done
 fi
 
 if ls /tmp/*.ready 1> /dev/null 2>&1; then
-	for entry in /tmp/*.ready
-	do
-	  sort ${entry} | uniq > ${entry}.unique
-	  curl -v -F logs=@${entry}.unique -F rasp_id=$1 http://php54-denismosolov.rhcloud.com
-	  rm -f $entry
+  for entry in /tmp/*.ready
+  do
+    sort ${entry} | uniq > ${entry}.unique
+    curl -v -F logs=@${entry}.unique -F rasp_id=$1 http://php54-denismosolov.rhcloud.com
+    rm -f $entry
     rm -f ${entry}.unique
-	done
+  done
 fi
