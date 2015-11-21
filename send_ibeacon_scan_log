@@ -7,6 +7,7 @@ done
 
 for entry in /tmp/*.ready
 do
+  sort /tmp/${entry}.ready | uniq > /tmp/${entry}.ready
   curl -v -F logs=@${entry} -F rasp_id=$1 http://php54-denismosolov.rhcloud.com
   sudo rm -f $entry
 done
