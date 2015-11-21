@@ -14,6 +14,7 @@ if [[ $1 == "parse" ]]; then
     if [ "$currentTime" != "$startTime" ]
     then
       mv /tmp/$startTime.log /tmp/$startTime.ready
+      sudo kill -9 $(pidof hcitool)
       exit 2
     fi
     count=$[count + 1]
@@ -34,7 +35,7 @@ if [[ $1 == "parse" ]]; then
           POWER=`echo "ibase=16; $POWER" | bc`
           POWER=$[POWER - 256]
           # rotate log file each minute
-          echo "$UUID $MAJOR $MINOR $POWER" >> /tmp/$(date +%H_%M).log
+          echo "$UUID $MAJOR $MINOR $POWER" >> /tmp/${currentTime}.log
         fi
         capturing=""
         packet=""
@@ -49,8 +50,10 @@ if [[ $1 == "parse" ]]; then
     fi
   done
 else
+  sudo hciconfig hci0 down
+  sudo hciconfig hci0 up
   sudo hcitool lescan 1>/dev/null &
   if [ "$(pidof hcitool)" ]; then
-    sudo hcidump --raw | ./$0 parse $1
+    sudo hcidump --raw | $0 parse $1
   fi
 fi
