@@ -1,24 +1,12 @@
 #!/bin/bash
 # iBeacon Scan by Radius Networks
-# run this task with receiver_id param (int)
 
 if [[ $1 == "parse" ]]; then
   packet=""
   capturing=""
   count=0
-  startTime=$(date +%H_%M)
   while read line
   do
-    #exit after a minute
-    currentTime=$(date +%H_%M)
-    if [ "$currentTime" != "$startTime" ]
-    then
-      #mv /tmp/$startTime.log /tmp/$startTime.ready
-      sort /tmp/$startTime.log | uniq > /tmp/$startTime.ready
-      rm /tmp/$startTime.log
-      sudo kill -9 $(pidof hcitool)
-      exit 2
-    fi
     count=$[count + 1]
     if [ "$capturing" ]; then
       if [[ $line =~ ^[0-9a-fA-F]{2}\ [0-9a-fA-F] ]]; then
@@ -26,18 +14,9 @@ if [[ $1 == "parse" ]]; then
       else
         if [[ $packet =~ ^04\ 3E\ 2A\ 02\ 01\ .{26}\ 02\ 01\ .{14}\ 02\ 15 ]]; then
           UUID=`echo $packet | sed 's/^.\{69\}\(.\{47\}\).*$/\1/'`
-          MAJOR=`echo $packet | sed 's/^.\{117\}\(.\{5\}\).*$/\1/'`
-          MINOR=`echo $packet | sed 's/^.\{123\}\(.\{5\}\).*$/\1/'`
-          POWER=`echo $packet | sed 's/^.\{129\}\(.\{2\}\).*$/\1/'`
           UUID=`echo $UUID | sed -e 's/\ //g' -e 's/^\(.\{8\}\)\(.\{4\}\)\(.\{4\}\)\(.\{4\}\)\(.\{12\}\)$/\1-\2-\3-\4-\5/'`
-          MAJOR=`echo $MAJOR | sed 's/\ //g'`
-          MAJOR=`echo "ibase=16; $MAJOR" | bc`
-          MINOR=`echo $MINOR | sed 's/\ //g'`
-          MINOR=`echo "ibase=16; $MINOR" | bc`
-          POWER=`echo "ibase=16; $POWER" | bc`
-          POWER=$[POWER - 256]
-          # rotate log file each minute
-          echo "$UUID" >> /tmp/${currentTime}.log
+          currentTime=$(date +%H_%M)
+	  echo "$UUID" >> /tmp/${currentTime}.log
         fi
         capturing=""
         packet=""
@@ -54,8 +33,8 @@ if [[ $1 == "parse" ]]; then
 else
   sudo hciconfig hci0 down
   sudo hciconfig hci0 up
-  sudo hcitool lescan 1>/dev/null &
+  sudo hcitool lescan --duplicates 1>/dev/null &
   if [ "$(pidof hcitool)" ]; then
-    sudo hcidump --raw | $0 parse $1
+    sudo hcidump --raw | ./$0 parse $1
   fi
 fi
