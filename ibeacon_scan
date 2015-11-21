@@ -13,7 +13,8 @@ if [[ $1 == "parse" ]]; then
     currentTime=$(date +%H_%M)
     if [ "$currentTime" != "$startTime" ]
     then
-     exit 2
+      mv /tmp/$startTime.log /tmp/$startTime.ready
+      exit 2
     fi
     count=$[count + 1]
     if [ "$capturing" ]; then
