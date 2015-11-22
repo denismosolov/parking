@@ -1,9 +1,14 @@
 #!/bin/bash
 
+current=$(date +%H_%M)
+
 if ls /tmp/*.log 1> /dev/null 2>&1; then
   for file in /tmp/*.log
   do
-    mv "$file" "${file/.log/.ready}"
+    if [ "$file" != "/tmp/$current.log" ]
+    then
+      mv "$file" "${file/.log/.ready}"
+    fi
   done
 fi
 
@@ -15,4 +20,4 @@ if ls /tmp/*.ready 1> /dev/null 2>&1; then
     rm -f $entry
     rm -f ${entry}.unique
   done
-fi
+fi 
