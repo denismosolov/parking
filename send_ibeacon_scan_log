@@ -11,7 +11,7 @@ if ls /tmp/*.ready 1> /dev/null 2>&1; then
   for entry in /tmp/*.ready
   do
     sort ${entry} | uniq > ${entry}.unique
-    curl -v -F logs=@${entry}.unique -F rasp_id=$1 http://php54-denismosolov.rhcloud.com
+    curl -v -F logs=@${entry}.unique -F rasp_id=$1 http://parking-denismosolov.rhcloud.com/history.php
     rm -f $entry
     rm -f ${entry}.unique
   done
