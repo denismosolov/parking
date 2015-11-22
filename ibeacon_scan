@@ -16,7 +16,7 @@ if [[ $1 == "parse" ]]; then
           UUID=`echo $packet | sed 's/^.\{69\}\(.\{47\}\).*$/\1/'`
           UUID=`echo $UUID | sed -e 's/\ //g' -e 's/^\(.\{8\}\)\(.\{4\}\)\(.\{4\}\)\(.\{4\}\)\(.\{12\}\)$/\1-\2-\3-\4-\5/'`
           currentTime=$(date +%H_%M)
-          echo "$UUID" >> /tmp/${currentTime}.log
+          echo "22$UUID" >> /tmp/${currentTime}.log
         fi
         capturing=""
         packet=""
