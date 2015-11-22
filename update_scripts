@@ -1,4 +1,11 @@
 #!/bin/bash
 
+service cron stop
+service supervisor stop
 cd /home/pi/parking
 git pull origin master
+cp ibeacon_scan /home/pi/ibeacon_scan
+cp send_ibeacon_scan_log /home/pi/send_ibeacon_scan_log
+cp update_scripts /home/pi/update_scripts
+service supervisor start
+service cron start
