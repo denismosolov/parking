@@ -7,5 +7,6 @@ git pull origin master
 cp ibeacon_scan /home/pi/ibeacon_scan
 cp send_ibeacon_scan_log /home/pi/send_ibeacon_scan_log
 cp update_scripts /home/pi/update_scripts
+cp supervisord.conf /etc/supervisor/supervisord.conf
 service supervisor start
 service cron start
