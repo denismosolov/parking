@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /home/pi/parking
+git pull origin master
